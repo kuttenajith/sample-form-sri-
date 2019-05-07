@@ -1,0 +1,416 @@
+import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import logo from '/home/raja/hrm/src/containers/assets/images/zencodelogo.png';
+import ButtonToolbar from 'react-bootstrap/lib/ButtonToolbar';
+import Button from 'react-bootstrap/lib/Button';
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+class Signup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeDate = this.handleChangeDate.bind(this);
+        this.handleChangeFromDate = this.handleChangeFromDate.bind(this);
+        this.handleChangeToDate = this.handleChangeToDate.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
+        this.handleAddRow = this.handleAddRow.bind(this);
+        this.handleRemoveRow = this.handleRemoveRow.bind(this);
+        this.handleChangepassenger = this.handleChangepassenger.bind(this);
+        this.textClear = this.textClear.bind(this);
+        this.state = {
+            fields: {},
+            errors: {},
+            password: '',
+            confirmPassword: '',
+            startDate: new Date(),
+            fromDate: new Date(),
+            toDate: new Date(),
+            rows: [],
+            inputVal: {},
+            values: [{
+                    name: 'Select',
+                    id: 0
+                },
+                {
+                    name: 'Second Sitting',
+                    id: 1
+                },
+                {
+                    name: 'AC',
+                    id: 2
+                },
+                {
+                    name: 'General',
+                    id: 3
+                }
+            ]
+        }
+
+    }
+    handleValidation() {
+            let fields = this.state.fields;
+            let errors = {};
+            let formIsValid = true;
+
+
+        //username
+        if (!fields["username"]) {
+            formIsValid = false;
+            errors["username"] = "This field is required";
+        }
+
+        if (typeof fields["username"] !== "undefined") {
+            if (!fields["username"].match(/^[a-zA-Z]+$/)) {
+                formIsValid = false;
+                errors["username"] = "Enter valid name";
+            }
+        }
+
+
+
+        //age
+        if (!fields["age"]) {
+            formIsValid = false;
+            errors["age"] = "This field is required";
+        }
+
+        if (typeof fields["age"] !== "undefined") {
+            if (fields["age"].match(0 - 9)) {
+                formIsValid = false;
+                errors["age"] = "Only integers";
+            }
+            if (fields["age"] < 18) {
+                formIsValid = false;
+                errors["age"] = "age must be greater than 18";
+            }
+            if (fields["age"].match(/^[a-zA-Z]+$/)) {
+                formIsValid = false;
+                errors["age"] = "Enter valid age";
+            }
+        }
+
+
+        //password
+        if (!fields["password"]) {
+            formIsValid = false;
+            errors["password"] = "This field is required";
+        }
+
+        if (typeof fields["password"] !== "undefined") {
+            if (fields["password"].match(/^[a-zA-Z0-9]+$/)) {
+                formIsValid = false;
+                errors["password"] = "password must include one special symbol,number and character";
+            }
+            if ((fields["password"].length > 8) && (fields["password"].length < 14)) {
+                formIsValid = true;
+            } else {
+                errors["password"] = "weak password"
+            }
+        }
+
+
+
+        //confirmpassword
+        if (!fields["confirmpassword"]) {
+            formIsValid = false;
+            errors["confirmpassword"] = "This field is required";
+        }
+
+        if (typeof fields["confirmpassword"] !== "undefined") {
+            if (fields["confirmpassword"].match(/^[a-zA-Z0-9]+$/)) {
+                formIsValid = false;
+                errors["confirmpassword"] = "password must include one special symbol,number and character";
+            }
+
+        }
+        if ((fields["confirmpassword"].length > 8) && (fields["confirmpassword"].length < 14)) {
+            formIsValid = true;
+        } else {
+            errors["password"] = "weak password"
+        }
+
+        //email
+        if (!fields["email"]) {
+            formIsValid = false;
+            errors["email"] = "This field is required";
+        }
+
+        if (typeof fields["email"] !== "undefined") {
+            let lastAtPos = fields["email"].lastIndexOf('@');
+            let lastDotPos = fields["email"].lastIndexOf('.');
+
+            if (!(lastAtPos < lastDotPos && lastAtPos > 0 && fields["email"].indexOf('@@') === -1 && lastDotPos > 2 && (fields["email"].length - lastDotPos) > 2)) {
+                formIsValid = false;
+                errors["email"] = "Email is not valid";
+            }
+        }
+        this.setState({
+            errors: errors
+        });
+        return formIsValid;
+        }
+
+    handleChange(field, event) {
+        let fields = this.state.fields;
+        fields[field] = event.target.value;
+        this.setState({
+            fields
+        });
+    }
+
+    handleChangeDate(date) {
+        var today = new Date();
+        this.setState({
+            startDate: date
+        });
+        if (today <= date) {
+            alert("Current or future date is not allowed.");
+            return false;
+        }
+    }
+
+    handleChangeFromDate(date) {
+        this.setState({
+            fromDate: date
+        });
+    }
+
+    handleChangeToDate(date) {
+    this.setState({
+        toDate: date
+        });
+    }
+
+    handleChangepassenger = idx => e => {
+        const {
+            name,
+            value
+        } = e.target;
+        const rows = [...this.state.rows];
+        rows[idx] = {
+            [name]: value
+        };
+        this.setState({
+            rows
+        });
+    };
+
+    handleAddRow = () => {
+        const item = {
+            name: "",
+            mobile: "",
+            coach: "",
+        };
+        this.setState({
+            rows: [...this.state.rows, item]
+        });
+    };
+
+    handleRemoveRow = () => {
+          this.setState({
+              rows: this.state.rows.slice(0, -1)
+        });
+    };
+
+    handleSubmit(event) {
+        event.preventDefault();
+        let password = this.state.password;
+        let confirmpassword = this.state.confirmpassword;
+        let fields = this.state.fields;
+
+        console.log(this.state.fields);
+        if (fields["password"] != fields["confirmpassword"]) {
+            alert("password does not match");
+        } else {
+
+            if (this.handleValidation()) {
+                console.log(this.state.fields);
+                alert("Account Created");
+            } else {
+                alert("Form has errors.")
+            }
+        }
+    }
+
+    textClear = (fields) => {
+        this.setState({
+            fields: ''
+        })
+        this.setState({
+            address: ''
+        })
+        this.setState({
+            gender: ''
+        })
+
+    }
+
+    render() {
+        let optionTemplate = this.state.values.map(v => (
+            <option value={v.id}>{v.name}</option>
+          ));
+        return (
+                    <div className="col-md-6">
+                        <img src={logo} alt="Logo" />
+                        <div>
+                            <h1>REGISTRATION FORM</h1>
+                        </div>
+                        
+                        <form id="create-course-form" class="" onSubmit={this.handleSubmit} noValidate >
+                            <div class="form-group" >
+                                <label for="username">User name :</label>
+                                <input type="string"
+                                    class="form-control"
+                                    id="username"
+                                    ref="fieldName"
+                                    placeholder="Enter username"
+                                    value={this.state.fields["username"]}
+                                    onChange={this.handleChange.bind(this, "username")} />
+                                <span style={{ color: "red" }}>{this.state.errors["username"]}</span>
+                            </div>
+                            <div class="form-group" >
+                                <label for="lastname">Age :</label>
+                                <input type="integer"
+                                    class="form-control"
+                                    id="age"
+                                    placeholder="Enter age"
+                                    value={this.state.fields["age"]}
+                                    onChange={this.handleChange.bind(this, "age")} />
+                                <span style={{ color: "red" }}>{this.state.errors["age"]}</span>
+                            </div>
+                            <div class="form-group" >
+                                <label for="DOB">Date Of Birth :</label>
+                                <DatePicker
+        selected={this.state.startDate}
+        onChange={this.handleChangeDate}
+      />
+                            </div>
+                            <div class="form-group" >
+                                <label for="email">Email:</label>
+                                <input type="email"
+                                    class="form-control"
+                                    id="email"
+                                    placeholder="email@example.com"
+                                    name="email"
+                                    value={this.state.fields["email"]}
+                                    onChange={this.handleChange.bind(this, "email")} />
+                                <span style={{ color: "red" }}>{this.state.errors["email"]}</span>
+                            </div>
+                            <div class="form-group" >
+                                <label for="DOJ">Date Of Journey :</label><br></br>
+                                <label for="from">From</label>
+                                <DatePicker
+        selected={this.state.fromDate}
+        onChange={this.handleChangeFromDate}
+      />
+      <label for="to">To</label>
+                                <DatePicker
+        selected={this.state.toDate}
+        onChange={this.handleChangeToDate}
+      />
+    </div>    
+    <form>    <b>PASSENGER LIST:</b>                  
+    <div>
+        <div className="container">
+          <div className="row clearfix">
+            <div className="col-md-12 column">
+              <table
+                className="table table-bordered table-hover"
+                id="tab_logic"
+              >
+                <thead>
+                  <tr>
+                    <th className="text-center"> s.no </th>
+                    <th className="text-center"> Name of the passenger </th>
+                    <th className="text-center"> Age </th>
+                    <th className="text-center"> Coach type </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.rows.map((item, idx) => (
+                    <tr id="addr0" key={idx}>
+                      <td>{idx}</td>
+                      <td>
+                        <input
+                          type="text"
+                          name="name"
+                          value={this.state.rows[idx].name}
+                          onChange={this.handleChangepassenger(idx)}
+                          className="form-control"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="text"
+                          name="age"
+                          value={this.state.rows[idx].age}
+                          onChange={this.handleChangepassenger(idx)}
+                          className="form-control"
+                        />
+                      </td>
+                      <td>
+                      <select value={this.state.rows[idx].coach} onChange={this.handleChangepassenger(idx)}>
+          {optionTemplate}
+        </select>
+                      </td>
+                      
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <input type="button"
+                onClick={this.handleAddRow}
+                value="Add Passenger"
+              />
+                
+                <input type="button"
+                onClick={this.handleRemoveRow}
+                value="Delete"
+              />
+            </div>
+          </div>
+        </div>
+      </div>   
+      </form>
+                       <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="password"
+                                    placeholder="Enter password"
+                                    name="password"
+                                    value={this.state.fields["password"]}
+                                    onChange={this.handleChange.bind(this, "password")}
+
+                                />
+                                <span id='meessage' style={{ color: "red" }}>{this.state.errors["password"]}</span><br></br>
+                                </div>
+                                <div className="form-group">
+                                    <label for="confirmpassword"> ConfirmPassword:</label>
+                                    <input
+                                        type="password"
+                                        class="form-control"
+                                        id="password"
+                                        name="confirmpassword"
+                                        class="form-control"
+                                        placeholder="Confirm Password"
+                                        value={this.state.fields["confirmpassword"]}
+                                        onChange={this.handleChange.bind(this, "confirmpassword")}
+
+                                    />
+                                    <span id='message' style={{ color: "red" }}>{this.state.errors["password"]}</span><br></br>
+                                </div>
+                                <button type="submit" class="btn btn-primary" >Submit</button>
+                                <input type="button" class="btn btn-primary" name="clear" value="Clear Form"  onClick={()=>{this.textClear()}}/>
+                            
+                        </form>
+                    </div>
+
+        );
+    }
+}
+export default Signup; 
